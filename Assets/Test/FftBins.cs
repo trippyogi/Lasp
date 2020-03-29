@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Lasp.Vfx;
+using Lasp;
 using UnityEngine;
 
 namespace Assets.Test
@@ -9,20 +9,17 @@ namespace Assets.Test
     {
         [SerializeField] [Range(1, 256)] int _fftBins = 11;
         public Material CubeMaterial;
-        public Lasp.AudioLevelTracker Target = null;
+        public AudioLevelTracker Tracker = null;
 
+        private AverageFft _fft;
         private int _bands;
         private float[] _normalizedLevel;
         private float _fall;
         private GameObject[] _cubes;
-        private int _sampleRate;
-        private const int Resolution = 1024;
-
-        private FftBuffer _fft;
 
         void Start()
         {
-            _sampleRate = Lasp.AudioSystem.InputDevices.FirstOrDefault().SampleRate;
+            _fft = new AverageFft(_fftBins, AudioSystem.InputDevices.FirstOrDefault().SampleRate);
             _bands = _fftBins;
             _normalizedLevel = new float[_fftBins];
             _cubes = new GameObject[_fftBins];
@@ -31,10 +28,7 @@ namespace Assets.Test
 
         void Update()
         {
-            if (_fft == null)
-                _fft = new FftBuffer(Resolution);
-            _fft.Push(Target.AudioDataSlice);
-            _fft.Analyze();
+            _fft.CalculateAverages(Tracker.AudioDataSlice, _fftBins);
             UpdateFftCubes();
         }
 
@@ -67,13 +61,13 @@ namespace Assets.Test
 
             for (var i = 0; i < _fftBins; i++)
             {
-                var input = float.IsNaN(_fft.Spectrum[i]) ? 0 : _fft.Spectrum[i];
-                var normalizedInput = Mathf.Clamp01(5 * input * Target.currentGain * (i + 1) / Target.dynamicRange);
+                var input = float.IsNaN(_fft.Averages[i]) ? 0 : _fft.Averages[i];
+                var normalizedInput = Mathf.Clamp01(5 * input * Tracker.currentGain * (i + 1) / Tracker.dynamicRange);
 
-                if (Target.smoothFall)
+                if (Tracker.smoothFall)
                 {
                     // Hold-and-fall-down animation.
-                    _fall += Mathf.Pow(10, 1 + Target.fallSpeed * 2) * dt;
+                    _fall += Mathf.Pow(10, 1 + Tracker.fallSpeed * 2) * dt;
                     _normalizedLevel[i] -= _fall * dt;
 
                     // Pull up by input.

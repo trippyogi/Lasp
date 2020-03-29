@@ -1,45 +1,54 @@
-﻿using Unity.Collections;
+﻿using System;
+using Lasp;
+using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 
 namespace Assets.Test
 {
-    public class AverageFft : MonoBehaviour
+    public class AverageFft : IDisposable
     {
-        private NativeArray<float> Input { get; }
-        private readonly int _numBins;
+        public NativeArray<float> Averages => _output;
+        private NativeArray<float> _output;
+        private readonly FftBuffer _fftBuffer;
         private static float _sampleRate;
 
-        public AverageFft(NativeArray<float> input, int numBins, float sampleRate)
+        public AverageFft(int numBins, int sampleRate)
         {
-            Input = input;
-            _numBins = numBins;
+            _fftBuffer = new FftBuffer(1024);
+            _output = new NativeArray<float>(numBins, Allocator.Persistent);
             _sampleRate = sampleRate;
         }
 
-        public NativeArray<float> CalculateAverages([ReadOnly] NativeArray<float> input)
+        public void CalculateAverages(NativeSlice<float> audioSlice, int numBins)
         {
-            Input.CopyFrom(input);
+            _fftBuffer.Push(audioSlice);
+            _fftBuffer.Analyze();
+
             // Log based averaging, which closely resembles how humans perceive sound
             const int minBandwidth = 60;
             var nyq = _sampleRate / 2.0f;
             var octaves = 1;
-            //// Log averaging algorithm returns one less band
-            //numBins++;
 
             while ((nyq /= 2) > minBandwidth)
             {
                 octaves++;
             }
 
-            var bandsPerOctave = _numBins / octaves;
-            var averages = new NativeArray<float>(_numBins, Allocator.Persistent);
+            var bandsPerOctave = _output.Length / octaves;
+            //var averages = new NativeArray<float>(_numBins, Allocator.Persistent);
 
             new AverageFftJob()
-                {Input = input, Averages = averages, Octaves = octaves, BandsPerOctaves = bandsPerOctave}.Run(_numBins);
+                {
+                    Input = _fftBuffer.Spectrum, Averages = _output, Octaves = octaves, BandsPerOctaves = bandsPerOctave
+                }
+                .Run(_output.Length);
+        }
 
-            return averages;
+        public void Dispose()
+        {
+            _output.Dispose();
+            _fftBuffer.Dispose();
         }
 
         private static float CalculateAvg([ReadOnly] NativeArray<float> input, float lowFreq, float hiFreq)

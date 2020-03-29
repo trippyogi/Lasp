@@ -406,9 +406,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abd70c262caf1bb4b8e659fd6e613104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _fftBins: 11
+  _fftBins: 32
   CubeMaterial: {fileID: 2100000, guid: 44d7894199f9faa49989105cd9a6563f, type: 2}
-  Target: {fileID: 1976909427}
+  Tracker: {fileID: 1976909427}
 --- !u!1 &1727369985
 GameObject:
   m_ObjectHideFlags: 0

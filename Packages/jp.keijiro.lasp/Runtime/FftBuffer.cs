@@ -4,7 +4,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine.Profiling;
 
-namespace Lasp.Vfx
+namespace Lasp
 {
     // Cooley–Tukey FFT vectorized/parallelized with the Burst compiler
 
