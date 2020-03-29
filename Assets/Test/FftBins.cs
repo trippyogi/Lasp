@@ -22,11 +22,6 @@ namespace Assets.Test
 
         void Start()
         {
-            Initialize();
-        }
-
-        void Initialize()
-        {
             _sampleRate = Lasp.AudioSystem.InputDevices.FirstOrDefault().SampleRate;
             _bands = _fftBins;
             _normalizedLevel = new float[_fftBins];
@@ -64,7 +59,7 @@ namespace Assets.Test
             if (_bands != _fftBins)
             {
                 OnDestroy();
-                Initialize();
+                Start();
                 return;
             }
 
