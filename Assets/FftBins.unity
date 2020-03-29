@@ -374,7 +374,7 @@ GameObject:
   - component: {fileID: 1471855154}
   - component: {fileID: 1471855155}
   m_Layer: 0
-  m_Name: AverageFftBins
+  m_Name: FftBins
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -403,13 +403,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1471855153}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66bda8372c6e0504fa34429091abc681, type: 3}
+  m_Script: {fileID: 11500000, guid: abd70c262caf1bb4b8e659fd6e613104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputGain: 24.6
-  _fftBins: 128
-  _holdAndFallDown: 1
-  _fallDownSpeed: 0.1
+  _fftBins: 11
   Target: {fileID: 1976909427}
 --- !u!1 &1727369985
 GameObject:
