@@ -9,12 +9,13 @@ namespace Assets.Test
     {
         private NativeArray<float> Input { get; }
         private readonly int _numBins;
-        private const float SampleRate = 48000;
+        private static float _sampleRate;
 
-        public AverageFft(NativeArray<float> input, int numBins)
+        public AverageFft(NativeArray<float> input, int numBins, float sampleRate)
         {
             Input = input;
             _numBins = numBins;
+            _sampleRate = sampleRate;
         }
 
         public NativeArray<float> CalculateAverages([ReadOnly] NativeArray<float> input)
@@ -22,7 +23,7 @@ namespace Assets.Test
             Input.CopyFrom(input);
             // Log based averaging, which closely resembles how humans perceive sound
             const int minBandwidth = 60;
-            var nyq = SampleRate / 2.0f;
+            var nyq = _sampleRate / 2.0f;
             var octaves = 1;
             //// Log averaging algorithm returns one less band
             //numBins++;
@@ -57,14 +58,14 @@ namespace Assets.Test
 
         private static int FreqToIndex([ReadOnly] NativeArray<float> input, float freq)
         {
-            var bandWidth = (2.0f / input.Length) * ((float) SampleRate / 2.0f);
+            var bandWidth = (2.0f / input.Length) * ((float) _sampleRate / 2.0f);
 
             // Special case: freq is lower than the bandwidth of spectrum[0]
             if (freq < bandWidth / 2) return 0;
             // Special case: freq is within the bandwidth of spectrum[spectrum.length - 1]
-            if (freq > SampleRate / 2 - bandWidth / 2) return input.Length - 1;
+            if (freq > _sampleRate / 2 - bandWidth / 2) return input.Length - 1;
 
-            var fraction = freq / (float) SampleRate;
+            var fraction = freq / (float) _sampleRate;
             var i = (int) (input.Length * fraction);
             return i;
         }
@@ -86,10 +87,10 @@ namespace Assets.Test
                     }
                     else
                     {
-                        lowFreq = (SampleRate / 2) / (float) math.pow(2, Octaves - i);
+                        lowFreq = (_sampleRate / 2) / (float) math.pow(2, Octaves - i);
                     }
 
-                    var hiFreq = (SampleRate / 2) / (float) math.pow(2, Octaves - i - 1);
+                    var hiFreq = (_sampleRate / 2) / (float) math.pow(2, Octaves - i - 1);
                     var freqStep = (hiFreq - lowFreq) / BandsPerOctaves;
                     var f = lowFreq;
                     for (var j = 0; j < BandsPerOctaves; j++)

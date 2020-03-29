@@ -407,6 +407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fftBins: 11
+  CubeMaterial: {fileID: 2100000, guid: 44d7894199f9faa49989105cd9a6563f, type: 2}
   Target: {fileID: 1976909427}
 --- !u!1 &1727369985
 GameObject:
@@ -543,7 +544,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.9292453, g: 0.9528302, b: 1, a: 0}
+  m_BackGroundColor: {r: 0.039215688, g: 0.05490196, b: 0.08627451, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
